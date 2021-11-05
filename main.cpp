@@ -1,16 +1,18 @@
-#ifdef _WIN32
-#define CLEAR "cls"
-#else
-#define CLEAR "clear"
-#endif
+// NOMBRES
+// ...
+// 
+#define CLEAR "clear" //cambiar esto cuando se compile en windows
 
 #include <stdio.h>	/* print, scanf */
 #include <string.h>
 #include <stdlib.h>	/* system */
 #include <locale.h> /* setlocale */
+#include <iostream>
  
 #define CaracteresMaximos 80
 #define valorCent -1
+
+using namespace std;
  
 // Título, Apellido del autor, Nombre del autor, Costo de venta (en quetzales), Editorial, Tipo de libro (científico, literatura, recreativo, juvenil, etc.), Fecha de copyright, Número de ejemplares disponibles, Estado (1 para libros que pueden solicitarse a la editorial y 0 para libros agotados en la editorial y que no se reimprimen).
 
@@ -26,7 +28,6 @@ struct libro {
   char fecha[CaracteresMaximos]; //agregado
 	int cantidad;
   char estado[CaracteresMaximos]; //agregado
-
 };
 
 struct compras {
@@ -38,13 +39,10 @@ struct compras {
   double costo;
   double impuesto;
 	int cantidad;
-
-
 };
 
  
 typedef struct libro Libro;
- 
 /* Opciones del Menú */
 void menuPrincipal();
 void menuInsertar();
@@ -53,6 +51,7 @@ void menuEliminar();
 void menuMostrar();
 void menuModificar();
 void menuEliminarFisica();
+void Login();
  
 /* Funciones para manejar el archivo directamente */
 Libro *obtenerLibros(int *n); /* Obtiene un vector dinámico de libros */
@@ -70,16 +69,16 @@ int leecad(char *cad, int n);
 void tituloPrincipal();
  
 char linea[CaracteresMaximos];
- 
+
 int main()
 {
 	setlocale(LC_ALL, "spanish"); /* Permite imprimir caracteres con tilde */
-	menuPrincipal();
+  Login();
  
 	return 0;
 }
  
-void menuPrincipal()
+void menuPrincipal(string tipoUsuario)
 {
 	char repite = 1;
 	int opcion = -1;
@@ -92,11 +91,6 @@ void menuPrincipal()
 		system(CLEAR);
  
 		tituloPrincipal();
-    
-
-
-
-    
  
 		printf("\n\t\t\t\t\t\t\t\t MENU PRINCIPAL\n");
     
@@ -130,7 +124,11 @@ void menuPrincipal()
 				break;
  
 			case 2:
-				menuMostrar();
+        if(tipoUsuario=="Propietario"){
+				  menuMostrar();
+        }else{
+		      printf("\n\t\tNo tienes permiso para esta acción\b\b");
+        }
 				break;
  
 			case 3:
@@ -143,12 +141,46 @@ void menuPrincipal()
  
 			case 5:
 				repite = 0;
+        Login();
 				break;
 		}
  
 	} while (repite);
 }
- 
+
+void Login() {
+  system(CLEAR);
+
+// AÑADIR USUARIOS en este arreglo
+	printf("\n     ============================================\n");
+	printf("\t\t\t\t\t\tLOGIN\n");
+	printf("     ============================================\n");
+
+  string Usuarios[2][3] = {{"Maria", "123", "Propietario"}, {"Javier", "abc", "Operador"}};
+
+  while (true) {
+    string Usuario, Contrasena;
+    int j = 0;
+
+    cout << "\n\tUsuario: ";
+    getline(cin, Usuario);
+    cout << "\tPassword: ";
+    getline(cin, Contrasena);
+
+    for (int i = 0; i <= 1; i++) {
+      if (Usuarios[i][0] == Usuario && Usuarios[i][1] == Contrasena) {
+        menuPrincipal(Usuarios[i][2]);
+      }
+      else {
+        j++;
+
+        if (j == 2) {
+          cout << "\n\t\tACCESO DENEGADO\n";
+        }
+      }
+    }
+  }
+}
 
 // -------------------------------------
 
@@ -276,61 +308,6 @@ void menuBuscar()
 }
 
 // -------------------------------------
-
-
-// TOCAR EN FUTURO -------------------------------------
-void menuEliminar()
-{
-	Libro libro;
-	int codigo;
-	char repite = 1;
-	char respuesta[CaracteresMaximos];
- 
-	do {
-		system(CLEAR);
-		tituloPrincipal();
-		printf("\n\t\t\t==| ELIMINAR PRODUCTO POR CÓDIGO |==\n");
- 
-		/* Se pide el código del libro a eliminar */
-		printf("\n\tCódigo de libro: ");
-		leecad(linea, CaracteresMaximos);
-		sscanf(linea, "%d", &codigo);
- 
-		/* Se verifica que el libro a buscar, exista */
-		if (existeProducto(codigo, &libro)) {
- 
-			/* Se muestran los datos del libro */
-			printf("\n\tCódigo del libro: %d\n", libro.codigo);
-			printf("\tNombre del libro: %s\n", libro.nombreAutor);			
-			printf("\tCosto del libro: %.1f $\n", libro.costo);
-			printf("\tCantidad: %d\n", libro.cantidad);
- 
-			printf("\n\tSeguro que desea eliminar el libro? [S/N]: ");
-			leecad(respuesta, CaracteresMaximos);
-			if (strcmp(respuesta, "S") == 0 || strcmp(respuesta, "s") == 0) {
-				if (eliminarProducto(codigo)) {
-					printf("\n\tProducto eliminado satisfactoriamente.\n");
-				} else {
-					printf("\n\tEl libro no pudo ser eliminado\n");
-				}
-			}
- 
-		} else {
-			/* El libro no existe */
-			printf("\n\tEl libro de código %d no existe.\n", codigo);
-		}
- 
-		printf("\n\tDesea eliminar otro libro? [S/N]: ");
-		leecad(respuesta, CaracteresMaximos);
- 
-		if (!(strcmp(respuesta, "S") == 0 || strcmp(respuesta, "s") == 0)) {
-			repite = 0;
-		}
- 
-	} while (repite);
-}
-// TOCAR EN FUTURO -------------------------------------
-
 
  
 void menuMostrar()
