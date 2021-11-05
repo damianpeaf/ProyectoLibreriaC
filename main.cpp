@@ -55,13 +55,13 @@ void menuModificar();
 void menuEliminarFisica();
  
 /* Funciones para manejar el archivo directamente */
-Libro *obtenerLibros(int *n); /* Obtiene un vector dinámico de productos */
-char existeProducto(int codigoProducto, Libro *libro); /* Busca si existe el libro en el archivo de productos */
+Libro *obtenerLibros(int *n); /* Obtiene un vector dinámico de libros */
+char existeProducto(int codigoProducto, Libro *libro); /* Busca si existe el libro en el archivo de libros */
 char insertarProducto(Libro libro); /* Inserta el libro al final del archivo */
 char eliminarProducto(int codigoProducto); /* Eliminar el libro de código codigoProducto del archivo */
-char eliminacionFisica(); /* Realiza la eliminación física de registros inválidos del archivo de productos */
-char modificarProducto(Libro libro); /* Modifica el libro en el archivo */
-char guardarReporte(); /* Genera un archivo TXT con el reporte de los productos */
+char eliminacionFisica(); /* Realiza la eliminación física de registros inválidos del archivo de libros */
+char modificarLibro(Libro libro); /* Modifica el libro en el archivo */
+char guardarReporte(); /* Genera un archivo TXT con el reporte de los libros */
  
 /* Función de lectura de cadenas */
 int leecad(char *cad, int n);
@@ -429,7 +429,21 @@ void menuModificar()
  
 			if (strcmp(respuesta, "S") == 0 || strcmp(respuesta, "s") == 0) {
 				/* Se modifica el libro en el archivo */
-				if(&libro){}
+          if(libro.cantidad==0){
+            if (eliminarProducto(codigo)) {
+            printf("\n\tProducto eliminado satisfactoriamente.\n");
+          } else {
+            printf("\n\tEl libro no pudo ser eliminado\n");
+          }
+        }else{
+          if (modificarLibro(libro)) {
+					printf("\n\tEl libro fue modificado correctamente\n");
+ 
+				  } else {
+					  printf("\n\tOcurrió un error al intentar modificar el libro\n");
+					  printf("\tInténtelo mas tarde\n");
+				  }
+        }
 			}
 		} else {
 			/* El libro no existe */
@@ -632,7 +646,7 @@ char eliminacionFisica()
 	return elimina;
 }
  
-char modificarProducto(Libro libro)
+char modificarLibro(Libro libro)
 {
 	FILE *archivo;
 	char modifica;
@@ -668,16 +682,16 @@ char guardarReporte()
 {
 	FILE *archivo;
 	char guardado;
-	Libro *productos;
-	int numeroProductos;
+	Libro *libros;
+	int numeroLibros;
 	int i;
 	float costoTotal;
 	float precioTotal;
 	int cantidadTotal;
  
-	productos = obtenerLibros(&numeroProductos); /* Retorna un vector dinámico de productos */
+	libros = obtenerLibros(&numeroLibros); /* Retorna un vector dinámico de libros */
  
-	if (numeroProductos == 0) {
+	if (numeroLibros == 0) {
 		guardado = 0;
  
 	} else {
@@ -688,25 +702,23 @@ char guardarReporte()
 			guardado = 0;
  
 		} else {
-			fprintf(archivo, "\n\t\t    ==> LISTADO DE PRODUCTOS REGISTRADOS <==\n");
+
+			fprintf(archivo, "\n\t\t    ==| LISTADO DE LIBROS REGISTRADOS |==\n");
 			fprintf(archivo, " ------------------------------------------------------------------------------\n");
-			fprintf(archivo, "%8s\t%-20s%15s%15s%10s\n", "CODIGO", "NOMBRE", "COSTO $", "PRECIO $", "CANTIDAD");
+			fprintf(archivo, "%8s\t%-20s%15s%15s%10s\n", "CODIGO", "TITULO", "COSTO Q", "CANTIDAD", "EDITORIAL");
 			fprintf(archivo, " ------------------------------------------------------------------------------\n");
  
-			/* Se recorre el vector dinámico de productos */
+			/* Se recorre el vector dinámico de libros */
 			costoTotal = 0;
-			precioTotal = 0;
-			cantidadTotal = 0;
-			for (i = 0; i < numeroProductos; i++) {
-				if (productos[i].codigo != valorCent) {
-					fprintf(archivo, "%7d \t%-20.20s%15.1f%15.1f%8d\n", productos[i].codigo, productos[i].nombreAutor, productos[i].costo, productos[i].precio, productos[i].cantidad);
-					costoTotal += productos[i].costo;
-					precioTotal += productos[i].precio;
-					cantidadTotal += productos[i].cantidad;
-				}
+		cantidadTotal = 0;
+		for (i = 0; i < numeroLibros; i++) {
+			if (libros[i].codigo != valorCent) {
+					fprintf(archivo, "%7d \t%-20.20s%15.1f%5d%20s\n", libros[i].codigo, libros[i].titulo, libros[i].costo, libros[i].cantidad, libros[i].editorial);
+				costoTotal += libros[i].costo;
+				cantidadTotal += libros[i].cantidad;
 			}
+		}
 			fprintf(archivo, " ------------------------------------------------------------------------------\n");
-			fprintf(archivo, "\t\t\t      TOTAL: %15.1f%15.1f%8d", costoTotal, precioTotal, cantidadTotal);
  
 			guardado = 1;
  
@@ -715,8 +727,8 @@ char guardarReporte()
 		}
 	}
 	
-	free(productos);
-	productos = NULL;
+	free(libros);
+	libros = NULL;
  
 	return guardado;
 }
