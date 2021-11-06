@@ -1,12 +1,9 @@
-// NOMBRES
-// ...
-// 
-#define CLEAR "clear" //cambiar esto cuando se compile en windows
+#define CLEAR "clear" //Depende si se compila en windows
 
-#include <stdio.h>	/* print, scanf */
+#include <stdio.h>	
 #include <string.h>
-#include <stdlib.h>	/* system */
-#include <locale.h> /* setlocale */
+#include <stdlib.h>
+#include <locale.h> 
 #include <iostream>
 #include <string>
 #include <vector>
@@ -22,15 +19,15 @@ using namespace std;
 /* Estructuras */
 struct libro {
 	int codigo;
-	char titulo[CaracteresMaximos]; //agregado
-	char apellidoAutor[CaracteresMaximos]; //agregado
-	char nombreAutor[CaracteresMaximos]; //aca iba nombre
-	double costo; //Antes era float
-	char editorial[CaracteresMaximos]; //agregado
-  char tipo[CaracteresMaximos]; //agregado
-  char fecha[CaracteresMaximos]; //agregado
+	char titulo[CaracteresMaximos]; 
+	char apellidoAutor[CaracteresMaximos]; 
+	char nombreAutor[CaracteresMaximos]; 
+	double costo; 
+	char editorial[CaracteresMaximos]; 
+  char tipo[CaracteresMaximos];
+  char fecha[CaracteresMaximos]; 
 	int cantidad;
-  char estado[CaracteresMaximos]; //agregado
+  char estado[CaracteresMaximos];
 
 
 };
@@ -38,7 +35,7 @@ struct libro {
 struct compra {
 	char nombreCliente[CaracteresMaximos]; 
 	char direccion[CaracteresMaximos];
-	double edad; //Antes era float
+	double edad; 
 	int codigo;
 	char titulo[CaracteresMaximos];
   double costo;
@@ -64,9 +61,9 @@ void Login();
  
 /* Funciones para manejar el archivo directamente */
 Libro *obtenerLibros(int *n); /* Obtiene un vector dinámico de libros */
-char existeProducto(int codigoProducto, Libro *libro); /* Busca si existe el libro en el archivo de libros */
-char insertarProducto(Libro libro); /* Inserta el libro al final del archivo */
-char eliminarProducto(int codigoProducto); /* Eliminar el libro de código codigoProducto del archivo */
+char existeLibro(int codigoLibro, Libro *libro); /* Busca si existe el libro en el archivo de libros */
+char insertarLibro(Libro libro); /* Inserta el libro al final del archivo */
+char eliminarLibro(int codigoLibro); /* Eliminar el libro de código codigo del archivo */
 char eliminacionFisica(); /* Realiza la eliminación física de registros inválidos del archivo de libros */
 char modificarLibro(Libro libro); /* Modifica el libro en el archivo */
 char guardarReporte(); /* Genera un archivo TXT con el reporte de los libros */
@@ -107,13 +104,8 @@ void menuPrincipal(string tipoUsuario)
     
 		printf("\n\t\t[1]. Registrar Nuevo Libro \n");
 
-    // 1. Un listado completo del inventario, ordenado alfabéticamente por el título de los libros.
-    // 2. Un listado completo del inventario, ordenado según el costo de venta del libro; de menor a mayor.
-    // 4. El programa debe generar una lista de los títulos de todos los libros que haya en el inventario e indicar cuántas copias de cada libro se venden cada día.
-    // 5. Listado de libros vendidos, indicando la información general del cliente (nombre completo, dirección, edad, etc.) que realizó la compra de este, así como el precio de venta. Para el precio de
-		printf("\t\t[2]. Reporte de libros\n");
 
-		// printf("\t\t[3]. Eliminar un libro\n"); <- borrado
+		printf("\t\t[2]. Reporte de libros\n");
 
     // 3. También quiere mostrar la información bibliográfica referente a un libro en concreto que haya en el inventario.
 		printf("\t\t[3]. Buscar información bibliografica por ID\n");
@@ -226,7 +218,7 @@ void menuInsertar()
 		sscanf(linea, "%d", &codigo);
  
 		/* Se verifica que el libro no haya sido almacenado anteriormente */
-		if (!existeProducto(codigo, &libro)) {
+		if (!existeLibro(codigo, &libro)) {
  
 			libro.codigo = codigo;
  
@@ -264,7 +256,7 @@ void menuInsertar()
 			leecad(libro.estado, CaracteresMaximos);
  
 			/* Se inserta el libro en el archivo */
-			if (insertarProducto(libro)) {
+			if (insertarLibro(libro)) {
 				printf("\n\tEl libro fue registrado correctamente\n");
  
 			} else {
@@ -285,8 +277,6 @@ void menuInsertar()
 	} while (repite);
 }
 
-// -------------------------------------
- 
 void menuBuscar()
 {
 	Libro libro;
@@ -305,7 +295,7 @@ void menuBuscar()
 		sscanf(linea, "%d", &codigo);
  
 		/* Se verifica que el libro a buscar, exista */
-		if (existeProducto(codigo, &libro)) {
+		if (existeLibro(codigo, &libro)) {
  
 			/* Se muestran los datos del libro */
 			printf("\n\tCódigo del libro: %d\n", libro.codigo);
@@ -412,7 +402,7 @@ void menuModificar()
 		sscanf(linea, "%d", &codigo);
  
 		/* Se verifica que el libro a buscar exista */
-		if (existeProducto(codigo, &libro)) {
+		if (existeLibro(codigo, &libro)) {
  
 			/* Se muestran los datos del libro */
 			printf("\tCantidad: %d\n", libro.cantidad);
@@ -424,23 +414,11 @@ void menuModificar()
 			leecad(respuesta, CaracteresMaximos);
 			if (strcmp(respuesta, "S") == 0 || strcmp(respuesta, "s") == 0) {
 
-        // PROCESO DE VENTA
-
       	Compra compra;
 
 				printf("\tNueva cantidad del libro: ");
 				leecad(linea, CaracteresMaximos);
 				sscanf(linea, "%d", &libro.cantidad);
-
-            // char nombreCliente[CaracteresMaximos]; 
-            // char direccion[CaracteresMaximos];
-            // double edad; //Antes era float
-            // int codigo;
-            // char titulo[CaracteresMaximos];
-            // double costo;
-            // double impuesto;
-            // int cantidad;
-        
 			}
  
 			printf("\n\tEstá seguro que desea modificar los datos del libro? [S/N]: ");
@@ -449,8 +427,8 @@ void menuModificar()
 			if (strcmp(respuesta, "S") == 0 || strcmp(respuesta, "s") == 0) {
 				/* Se modifica el libro en el archivo */
           if(libro.cantidad==0){
-            if (eliminarProducto(codigo)) {
-            printf("\n\tProducto eliminado satisfactoriamente.\n");
+            if (eliminarLibro(codigo)) {
+            printf("\n\t Libro eliminado satisfactoriamente.\n");
           } else {
             printf("\n\tEl libro no pudo ser eliminado\n");
           }
@@ -539,7 +517,7 @@ Libro *obtenerLibros(int *n)
 	return libros;
 }
  
-char existeProducto(int codigoProducto, Libro *libro)
+char existeLibro(int codigoLibro, Libro *libro)
 {
 	FILE *archivo;
 	char existe;
@@ -553,10 +531,10 @@ char existeProducto(int codigoProducto, Libro *libro)
 	} else {
 		existe = 0;
  
-		/* Se busca el libro cuyo código coincida con codigoProducto */
+		/* Se busca el libro cuyo código coincida con codigoLibro */
 		fread(&(*libro), sizeof(*libro), 1, archivo);
 		while (!feof(archivo)) {
-			if ((*libro).codigo == codigoProducto) {
+			if ((*libro).codigo == codigoLibro) {
 				existe = 1;
 				break;
 			}
@@ -570,7 +548,7 @@ char existeProducto(int codigoProducto, Libro *libro)
 	return existe;
 }
  
-char insertarProducto(Libro libro)
+char insertarLibro(Libro libro)
 {
 	FILE *archivo;
 	char insercion;
@@ -593,7 +571,7 @@ char insertarProducto(Libro libro)
 }
  
 /* ELiminación lógica de un registro */
-char eliminarProducto(int codigoProducto)
+char eliminarLibro(int codigoLibro)
 {
 	FILE *archivo;
 	FILE *auxiliar;
@@ -607,14 +585,11 @@ char eliminarProducto(int codigoProducto)
 		elimina = 0;
  
 	} else {
-		/* Se busca el registro que se quiere borrar. Cuando se encuentra, se sitúa en esa posición mediante la 
-		función fseek y luego se modifica el campo clave de ese registro mediante algún valor centinela, eso se logra 
-		con fwrite. Hasta allí se ha logrado una eliminación LÓGICA. Porque el registro sigue ocupando espacio en el archivo físico */
  
 		elimina = 0;
 		fread(&libro, sizeof(libro), 1, archivo);
 		while (!feof(archivo)) {
-			if (libro.codigo == codigoProducto) {
+			if (libro.codigo == codigoLibro) {
 				fseek(archivo, ftell(archivo) - sizeof(libro), SEEK_SET);
 				libro.codigo = valorCent;
 				fwrite(&libro, sizeof(libro), 1, archivo);
@@ -669,7 +644,7 @@ char modificarLibro(Libro libro)
 {
 	FILE *archivo;
 	char modifica;
-	Libro producto2;
+	Libro libro2;
  
 	/* Abre el archivo para lectura/escritura */
 	archivo = fopen("libros.dat", "rb+");
@@ -679,15 +654,15 @@ char modificarLibro(Libro libro)
  
 	} else {
 		modifica = 0;
-		fread(&producto2, sizeof(producto2), 1, archivo);
+		fread(&libro2, sizeof(libro2), 1, archivo);
 		while (!feof(archivo)) {
-			if (producto2.codigo == libro.codigo) {
+			if (libro2.codigo == libro.codigo) {
 				fseek(archivo, ftell(archivo) - sizeof(libro), SEEK_SET);
 				fwrite(&libro, sizeof(libro), 1, archivo);
 				modifica = 1;
 				break;
 			}
-			fread(&producto2, sizeof(producto2), 1, archivo);
+			fread(&libro2, sizeof(libro2), 1, archivo);
 		}
  
 		fclose(archivo);
@@ -755,51 +730,25 @@ char guardarReporte()
 int leecad(char *cad, int n)
 {
 	int i, c;
- 
-	/* Hay que verificar si el buffer está limpio o si hay un '\n'
-	  dejado por scanf y, en ese caso, limpiarlo:
-	*/
- 
+  
 	/* 1 COMPROBACIÓN DE DATOS INICIALES EN EL BUFFER */
- 
-	/* Empezamos leyendo el primer caracter que haya en la entrada. Si es
-	  EOF, significa que no hay nada por leer, así que cerramos la cadena,
-	  dejándola "vacía" y salimos de la función retornando un valor de 0
-	  o falso, para indicar que hubo un error */
+
 	c = getchar();
 	if (c == EOF) {
 		cad[0] = '\0';
 		return 0;
 	}
- 
-	/* Si el valor leído es '\n', significa que había un caracter de nueva línea
-	dejado por un scanf o función similar. Simplemente inicializamos i a 0,
-	para indicar que los siguientes caracteres que leamos iremos asignando a
-	partir del primer caracter de la cadena. */
+
 	if (c == '\n') {
 		i = 0;
 	} else {
-	/* Si no había un '\n', significa que el caracter que leímos es el primer
-	  caracter de la cadena introducida. En este caso, lo guardamos en la
-	  posición 0 de cad, e inicializamos i a 1, porque en este caso, como ya
-	  tenemos el primer caracter de la cadena, continuaremos agregando 
-	  caracteres a partir del segundo.
- 
-	*/
+
 		cad[0] = c;
 		i = 1;
 	}
  
 	/* 2. LECTURA DE LA CADENA */
- 
-	/* El for empieza con un ; porque estamos omitiendo la inicialización del contador,
-	ya que fue inicializado en el punto anterior.
-	Este código lee un caracter a la vez,lo agrega a cad, y se repite hasta que
-	se encuentre un fin de línea, fin de archivo, o haya leído la cantidad máxima
-	de caracteres que se le indicó. Luego, cierra la cadena agregando un '\0'
-	al final. Todo esto es muy similar a la forma en que los compiladores suelen
-	implementar la función fgets, sólo que en lugar de getchar usan getc o fgetc
-	*/
+
 	for (; i < n - 1 && (c = getchar()) != EOF && c != '\n'; i++) {
 		cad[i] = c;
 	}
@@ -811,14 +760,6 @@ int leecad(char *cad, int n)
 	if (c != '\n' && c != EOF) /* es un caracter */
 		while ((c = getchar()) != '\n' && c != EOF);
  
-	/* La variable c contiene el último caracter leído. Recordemos que había 3 formas
-	de salir del for: que hayamos encontrando un '\n', un EOF, o que hayamos llegado
-	al máximo de caracteres que debemos leer. Si se da cualquiera de los dos
-	primeros casos, significa que leímos todo lo que había en el buffer, por lo que
-	no hay nada que limpiar. En el tercer caso, el usuario escribió más caracteres
-	de los debidos, que aún están en el buffer, por lo que hay que quitarlos, para
-	lo cual usamos el método que vimos poco más arriba
-	*/
  
 	return 1;
 }
@@ -838,29 +779,4 @@ void tituloPrincipal()
 	}
 }
 
-
-// void ordenarArreglo()
-// {
-//     int CANTIDAD_LIBROS =sizeof(libro);
-
-//     int x;
-//     for (x = 0; x < CANTIDAD_LIBROS; x++)
-//     {
-//         int indiceActual;
-//         for (indiceActual = 0; indiceActual < CANTIDAD_LIBROS - 1;
-//              indiceActual++)
-//         {
-//             int indiceSiguienteElemento = indiceActual + 1;
-
-//             // Ordenar por altura, de manera descendente
-//             if (libro[indiceActual].costo > libro[indiceSiguienteElemento].costo)
-//             {
-//                 // Intercambiar
-//                 memcpy(&temporal, &libro[indiceActual], sizeof(struct libro));
-//                 memcpy(&libro[indiceActual], &libro[indiceSiguienteElemento], sizeof(struct libro));
-//                 memcpy(&libro[indiceSiguienteElemento], &temporal, sizeof(struct libro));
-//             }
-//         }
-//     }
-// }
 
