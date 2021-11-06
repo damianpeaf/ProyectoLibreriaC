@@ -8,6 +8,9 @@
 #include <stdlib.h>	/* system */
 #include <locale.h> /* setlocale */
 #include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
  
 #define CaracteresMaximos 80
 #define valorCent -1
@@ -28,9 +31,11 @@ struct libro {
   char fecha[CaracteresMaximos]; //agregado
 	int cantidad;
   char estado[CaracteresMaximos]; //agregado
+
+
 };
 
-struct compras {
+struct compra {
 	char nombreCliente[CaracteresMaximos]; 
 	char direccion[CaracteresMaximos];
 	double edad; //Antes era float
@@ -43,6 +48,8 @@ struct compras {
 
  
 typedef struct libro Libro;
+typedef struct compra Compra;
+
 /* Opciones del Menú */
 void menuPrincipal();
 void menuInsertar();
@@ -52,6 +59,8 @@ void menuMostrar();
 void menuModificar();
 void menuEliminarFisica();
 void Login();
+
+
  
 /* Funciones para manejar el archivo directamente */
 Libro *obtenerLibros(int *n); /* Obtiene un vector dinámico de libros */
@@ -69,6 +78,8 @@ int leecad(char *cad, int n);
 void tituloPrincipal();
  
 char linea[CaracteresMaximos];
+
+
 
 int main()
 {
@@ -124,7 +135,7 @@ void menuPrincipal(string tipoUsuario)
 				break;
  
 			case 2:
-        if(tipoUsuario=="Propietario"){
+        if(tipoUsuario == "Propietario"){
 				  menuMostrar();
         }else{
 		      printf("\n\t\tNo tienes permiso para esta acción\b\b");
@@ -149,16 +160,19 @@ void menuPrincipal(string tipoUsuario)
 }
 
 void Login() {
-  system(CLEAR);
-
-// AÑADIR USUARIOS en este arreglo
-	printf("\n     ============================================\n");
-	printf("\t\t\t\t\t\tLOGIN\n");
-	printf("     ============================================\n");
-
-  string Usuarios[2][3] = {{"Maria", "123", "Propietario"}, {"Javier", "abc", "Operador"}};
+  string Usuarios[4][3] = 
+  {{"Maria", "123", "Propietario"}, 
+  {"Diego", "456", "Propietario"}, 
+  {"Javier", "abc", "Operador"}, 
+  {"Luisa", "cde", "Operador"}};
 
   while (true) {
+    system(CLEAR);
+
+    printf("\n     ============================================\n");
+    printf("\t\t\t\t\t\tLOGIN\n");
+    printf("     ============================================\n");
+
     string Usuario, Contrasena;
     int j = 0;
 
@@ -167,7 +181,9 @@ void Login() {
     cout << "\tPassword: ";
     getline(cin, Contrasena);
 
-    for (int i = 0; i <= 1; i++) {
+    string Opcion;
+
+    for (int i = 0; i <= 3; i++) {
       if (Usuarios[i][0] == Usuario && Usuarios[i][1] == Contrasena) {
         menuPrincipal(Usuarios[i][2]);
       }
@@ -175,13 +191,21 @@ void Login() {
         j++;
 
         if (j == 2) {
-          cout << "\n\t\tACCESO DENEGADO\n";
+          cout << "\n\t\t¡ACCESO DENEGADO!";
+
+          printf("\n\t\t Ingrese cualquier caracter para continuar ");
+          printf("\n\t\t O ingrese 's' para salir: [ ]\b\b");
+
+          getline(cin, Opcion);
         }
       }
     }
+
+    if (Opcion == "S" || Opcion == "s"){
+      break;
+    }
   }
 }
-
 // -------------------------------------
 
 void menuInsertar()
@@ -221,7 +245,7 @@ void menuInsertar()
  
 			printf("\tCosto del libro (Q): ");
 			leecad(linea, CaracteresMaximos);
-			sscanf(linea, "%2lf", &libro.costo);
+			sscanf(linea, "%lf", &libro.costo);
 
       printf("\tEditoral del Libro: ");
 			leecad(libro.editorial, CaracteresMaximos);
@@ -314,14 +338,15 @@ void menuMostrar()
 {
 	Libro *libros;
 	int numeroLibros;
-	int i;
+	int i, j, temp;
 	float costoTotal;
 	int cantidadTotal;
 	char respuesta[CaracteresMaximos];
  
 	system(CLEAR);
 	tituloPrincipal();
-	libros = obtenerLibros(&numeroLibros); /* Retorna un vector dinámico de productos */
+	libros = obtenerLibros(&numeroLibros); /* Retorna un vector dinámico de libros */
+
  
 	if (numeroLibros == 0) {
 		printf("\n\tEl archivo está vacío!!\n");
@@ -338,18 +363,21 @@ void menuMostrar()
 		printf(" ------------------------------------------------------------------------------\n");
 		printf("%8s\t%-20s%15s%15s%10s\n", "CODIGO", "TITULO", "COSTO Q", "CANTIDAD", "EDITORIAL");
 		printf(" ------------------------------------------------------------------------------\n");
+
+    cout << endl;
  
-		/* Se recorre el vector dinámico de productos */
-		costoTotal = 0;
-		cantidadTotal = 0;
+		/* Se recorre el vector dinámico de libros */
 		for (i = 0; i < numeroLibros; i++) {
 			if (libros[i].codigo != valorCent) {
-				printf("%7d \t%-20.20s%15.1f%5d%20s\n", libros[i].codigo, libros[i].titulo, libros[i].costo, libros[i].cantidad, libros[i].editorial);
-				costoTotal += libros[i].costo;
-				cantidadTotal += libros[i].cantidad;
+        
+        printf("%7d \t %-20.20s %.2lf %5d %20s\n", libros[i].codigo, libros[i].titulo, libros[i].costo, libros[i].cantidad, libros[i].editorial);
 			}
 		}
 		printf(" ------------------------------------------------------------------------------\n");
+
+    vector<string> arr = { "raid", "implementation", "states", "all",
+                           "the", "requirements", "parameter", "a",
+                           "and", "or", "execution", "participate" };
  
 		printf("\n\tDesea guardar el reporte en un archivo de texto? [S/N]: ");
 		leecad(respuesta, CaracteresMaximos);
@@ -376,7 +404,7 @@ void menuModificar()
 	do {
 		system(CLEAR);
 		tituloPrincipal();
-		printf("\n\t\t\t==| MODIFICAR LIBRO POR CÓDIGO |==\n");
+		printf("\n\t\t\t==| Venta de LIBRO POR CÓDIGO |==\n");
  
 		/* Se pide el código del libro a modificar */
 		printf("\n\tCódigo de libro: ");
@@ -389,16 +417,30 @@ void menuModificar()
 			/* Se muestran los datos del libro */
 			printf("\tCantidad: %d\n", libro.cantidad);
  
-			printf("\n\tElija los datos a modificar\n");
  			
 			/* Modificación de la cantidad del libro */
 			printf("\n\tCantidad del libro actual: %d\n", libro.cantidad);
 			printf("\tDesea modificar la cantidad del libro? [S/N]: ");
 			leecad(respuesta, CaracteresMaximos);
 			if (strcmp(respuesta, "S") == 0 || strcmp(respuesta, "s") == 0) {
+
+        // PROCESO DE VENTA
+
+      	Compra compra;
+
 				printf("\tNueva cantidad del libro: ");
 				leecad(linea, CaracteresMaximos);
 				sscanf(linea, "%d", &libro.cantidad);
+
+            // char nombreCliente[CaracteresMaximos]; 
+            // char direccion[CaracteresMaximos];
+            // double edad; //Antes era float
+            // int codigo;
+            // char titulo[CaracteresMaximos];
+            // double costo;
+            // double impuesto;
+            // int cantidad;
+        
 			}
  
 			printf("\n\tEstá seguro que desea modificar los datos del libro? [S/N]: ");
@@ -465,7 +507,7 @@ Libro *obtenerLibros(int *n)
 {
 	FILE *archivo;
 	Libro libro;
-	Libro *productos; /* Vector dinámico de productos */
+	Libro *libros; /* Vector dinámico de libros */
 	int i;
  
 	/* Abre el archivo en modo lectura */
@@ -473,20 +515,20 @@ Libro *obtenerLibros(int *n)
  
 	if (archivo == NULL) { /* Si no se pudo abrir el archivo, el valor de archivo es NULL */
 		*n = 0; /* No se pudo abrir. Se considera n  */
-		productos = NULL;
+		libros = NULL;
  
 	} else {
  
 		fseek(archivo, 0, SEEK_END); /* Posiciona el cursor al final del archivo */
-		*n = ftell(archivo) / sizeof(Libro); /* # de productos almacenados en el archivo. (# de registros) */
-		productos = (Libro *)malloc((*n) * sizeof(Libro)); /* Se reserva memoria para todos los productos almacenados en el archivo */
+		*n = ftell(archivo) / sizeof(Libro); /* # de libros almacenados en el archivo. (# de registros) */
+		libros = (Libro *)malloc((*n) * sizeof(Libro)); /* Se reserva memoria para todos los libros almacenados en el archivo */
  
 		/* Se recorre el archivo secuencialmente */
 		fseek(archivo, 0, SEEK_SET); /* Posiciona el cursor al principio del archivo */
 		fread(&libro, sizeof(libro), 1, archivo);
 		i = 0;
 		while (!feof(archivo)) {
-			productos[i++] = libro;
+			libros[i++] = libro;
 			fread(&libro, sizeof(libro), 1, archivo);
 		}
  
@@ -494,7 +536,7 @@ Libro *obtenerLibros(int *n)
 		fclose(archivo);
 	}
  
-	return productos;
+	return libros;
 }
  
 char existeProducto(int codigoProducto, Libro *libro)
@@ -795,3 +837,30 @@ void tituloPrincipal()
 		putchar('_');
 	}
 }
+
+
+// void ordenarArreglo()
+// {
+//     int CANTIDAD_LIBROS =sizeof(libro);
+
+//     int x;
+//     for (x = 0; x < CANTIDAD_LIBROS; x++)
+//     {
+//         int indiceActual;
+//         for (indiceActual = 0; indiceActual < CANTIDAD_LIBROS - 1;
+//              indiceActual++)
+//         {
+//             int indiceSiguienteElemento = indiceActual + 1;
+
+//             // Ordenar por altura, de manera descendente
+//             if (libro[indiceActual].costo > libro[indiceSiguienteElemento].costo)
+//             {
+//                 // Intercambiar
+//                 memcpy(&temporal, &libro[indiceActual], sizeof(struct libro));
+//                 memcpy(&libro[indiceActual], &libro[indiceSiguienteElemento], sizeof(struct libro));
+//                 memcpy(&libro[indiceSiguienteElemento], &temporal, sizeof(struct libro));
+//             }
+//         }
+//     }
+// }
+
